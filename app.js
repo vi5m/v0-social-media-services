@@ -160,6 +160,7 @@ function addToCart(serviceId) {
       name: service.name,
       price: firstPrice,
       quantity: firstQty,
+      platform: service.platform,
     })
     saveCart()
     updateCartCount()
@@ -283,60 +284,81 @@ function backToCart() {
 }
 
 function completeOrder() {
-  const account = document.getElementById("order-account").value
-  const email = document.getElementById("order-email").value
-  const phone = document.getElementById("order-phone").value
+  const accountName = document.getElementById("order-account").value.trim()
+  const email = document.getElementById("order-email").value.trim()
+  const phone = document.getElementById("order-phone").value.trim()
+  const notes = document.getElementById("order-notes").value.trim()
+  const paymentMethod = document.querySelector('input[name="payment"]:checked').value
 
-  if (!account || !email || !phone) {
-    showNotification("يرجى ملء بيانات الطلب", "warning")
+  if (!accountName || !email || !phone) {
+    showToast("يرجى ملء جميع البيانات المطلوبة", "error")
     return
   }
 
-  const paymentMethod = document.querySelector('input[name="payment"]:checked').value
-  const currency = document.getElementById("currency-select").value
-  const totalSAR = cart.reduce((sum, item) => sum + item.price, 0)
+  if (cart.length === 0) {
+    showToast("السلة فارغة", "error")
+    return
+  }
+
+  const currencySelect = document.getElementById("currency-select")
+  const selectedCurrency = currencySelect ? currencySelect.value : "SAR"
+  const totalInSAR = Number.parseFloat(document.getElementById("checkout-total").textContent)
 
   const order = {
     id: Date.now(),
     date: new Date().toLocaleString("ar-SA"),
-    accountName: account,
-    email,
-    phone,
-    items: cart.map((item) => ({
-      name: item.name,
+    services: cart.map((item) => ({
+      serviceId: item.serviceId,
+      serviceName: item.name,
+      platform: item.platform,
       quantity: item.quantity,
-      price: item.price,
+      pricePerUnit: item.price,
+      subtotal: item.quantity * item.price,
     })),
-    total: totalSAR,
-    paymentMethod,
-    currency,
+    total: totalInSAR,
+    currency: selectedCurrency,
     status: "pending",
-    notes: document.getElementById("order-notes").value,
+    accountName: accountName,
+    email: email,
+    phone: phone,
+    notes: notes,
+    paymentMethod: paymentMethod,
+    currentUser: currentUser ? currentUser.email : "guest",
   }
 
+  // Load existing orders
+  let orders = []
+  const savedOrders = localStorage.getItem("orders")
+  if (savedOrders) {
+    orders = JSON.parse(savedOrders)
+  }
+
+  // Add new order
   orders.push(order)
+
+  // Save to localStorage
   localStorage.setItem("orders", JSON.stringify(orders))
 
-  showNotification("تم تأكيد الطلب بنجاح! سنتواصل معك قريباً", "success")
+  console.log("[v0] Order saved to localStorage:", order)
+  console.log("[v0] All orders:", orders)
 
+  showToast("تم تأكيد الطلب بنجاح! سيتم مراجعته قريباً", "success")
+
+  // Clear cart and close checkout
   cart = []
-  saveCart()
+  localStorage.setItem("cart", JSON.stringify(cart))
   updateCartCount()
 
-  document.getElementById("checkout-page").style.display = "none"
   setTimeout(() => {
-    window.location.href = "#home"
-  }, 2000)
+    document.getElementById("checkout-page").style.display = "none"
+    document.getElementById("cart-modal").style.display = "none"
+    document.querySelector("main").style.display = "block"
+    scrollToTop()
+  }, 1500)
 }
 
-function contactViaWhatsapp() {
-  const phone = "+966594569011"
-  const message = "أريد الاستفسار عن الخدمات"
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`)
-}
-
-function openServiceModal(serviceId) {
-  addToCart(serviceId)
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" })
 }
 
 // ========== AUTH FUNCTIONS ==========
@@ -437,6 +459,26 @@ function closeModal(modalId) {
 
 // ========== NOTIFICATIONS ==========
 function showNotification(message, type = "info") {
+  const notification = document.createElement("div")
+  notification.className = `notification notification-${type}`
+  notification.textContent = message
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === "success" ? "#10b981" : type === "error" ? "#ef4444" : type === "warning" ? "#f59e0b" : "#3b82f6"};
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    animation: slideIn 0.3s ease-in-out;
+  `
+  document.body.appendChild(notification)
+  setTimeout(() => notification.remove(), 3000)
+}
+
+function showToast(message, type = "info") {
   const notification = document.createElement("div")
   notification.className = `notification notification-${type}`
   notification.textContent = message

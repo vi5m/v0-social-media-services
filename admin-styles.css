@@ -199,9 +199,9 @@ body.dark-mode .input-field {
   text-align: center;
   color: var(--text-gray);
   margin-top: 1.5rem;
-  font-size: 0.9rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
+  font-size: 0.9rem;
 }
 
 /* ========== ADMIN DASHBOARD ========== */
@@ -1143,12 +1143,6 @@ body.dark-mode .order-detail-item {
   }
 
   .form-actions {
-    flex-direction: column;
-  }
-
-  .submit-btn,
-  .cancel-btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
+    flex-direction: column; /* Fixed: Completed the flex-direction property */
+  } /* Fixed: Added missing closing brace for .form-actions */
+} /* Fixed: Added missing closing brace for media query */

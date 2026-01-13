@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم الأدمن - خدمات التواصل</title>
+    <title>لوحة تحكم الأدمن</title>
     <link rel="stylesheet" href="admin-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -18,11 +18,11 @@
             <form onsubmit="adminLogin(event)">
                 <div class="form-group">
                     <label>اسم المستخدم</label>
-                    <input type="text" id="admin-username" placeholder="أدخل اسم المستخدم" class="input-field" required>
+                    <input type="text" id="admin-username" placeholder="admin" class="input-field" required>
                 </div>
                 <div class="form-group">
                     <label>كلمة المرور</label>
-                    <input type="password" id="admin-password" placeholder="أدخل كلمة المرور" class="input-field" required>
+                    <input type="password" id="admin-password" placeholder="admin123" class="input-field" required>
                 </div>
                 <button type="submit" class="login-btn">
                     <i class="fas fa-sign-in-alt"></i> دخول
@@ -41,7 +41,7 @@
                 <button class="sidebar-toggle" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1>لوحة تحكم الأدمن</h1>
+                <h1>لوحة التحكم</h1>
             </div>
             <div class="top-bar-right">
                 <button class="theme-toggle" onclick="toggleAdminTheme()">
@@ -63,13 +63,13 @@
                     <i class="fas fa-chart-line"></i> الرئيسية
                 </button>
                 <button onclick="showAdminSection('services')" class="nav-btn">
-                    <i class="fas fa-cube"></i> إدارة الخدمات
+                    <i class="fas fa-cube"></i> الخدمات
                 </button>
                 <button onclick="showAdminSection('orders')" class="nav-btn">
                     <i class="fas fa-shopping-bag"></i> الطلبات
                 </button>
                 <button onclick="showAdminSection('payment-methods')" class="nav-btn">
-                    <i class="fas fa-credit-card"></i> طرق الدفع
+                    <i class="fas fa-credit-card"></i> الدفع
                 </button>
                 <button onclick="showAdminSection('settings')" class="nav-btn">
                     <i class="fas fa-cog"></i> الإعدادات
@@ -87,38 +87,30 @@
 
                 <div class="stats-grid">
                     <div class="stat-card stat-orders">
-                        <div class="stat-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
+                        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
                         <div class="stat-content">
                             <h3>إجمالي الطلبات</h3>
                             <p class="stat-number" id="total-orders">0</p>
                         </div>
                     </div>
                     <div class="stat-card stat-sales">
-                        <div class="stat-icon">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
+                        <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
                         <div class="stat-content">
-                            <h3>المبيعات الكلية</h3>
+                            <h3>المبيعات</h3>
                             <p class="stat-number" id="total-sales">0 ر.س</p>
                         </div>
                     </div>
                     <div class="stat-card stat-pending">
-                        <div class="stat-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
                         <div class="stat-content">
-                            <h3>الطلبات المعلقة</h3>
+                            <h3>معلقة</h3>
                             <p class="stat-number" id="pending-orders">0</p>
                         </div>
                     </div>
                     <div class="stat-card stat-completed">
-                        <div class="stat-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                         <div class="stat-content">
-                            <h3>الطلبات المكتملة</h3>
+                            <h3>مكتملة</h3>
                             <p class="stat-number" id="completed-orders">0</p>
                         </div>
                     </div>
@@ -141,23 +133,22 @@
                 </div>
             </section>
 
-            <!-- Services Management Section -->
+            <!-- Services Section -->
             <section id="services-section" class="admin-section" style="display:none;">
                 <div class="section-header">
                     <h2><i class="fas fa-cube"></i> إدارة الخدمات</h2>
                     <button onclick="showAddServiceForm()" class="add-btn">
-                        <i class="fas fa-plus"></i> إضافة خدمة جديدة
+                        <i class="fas fa-plus"></i> إضافة خدمة
                     </button>
                 </div>
 
-                <!-- Add/Edit Service Form -->
                 <div id="service-form-container" class="form-container" style="display:none;">
                     <h3 id="form-title">إضافة خدمة جديدة</h3>
                     <form onsubmit="submitService(event)">
                         <div class="form-row">
                             <div class="form-group">
                                 <label>اسم الخدمة</label>
-                                <input type="text" id="service-name" placeholder="مثال: متابعين تيك توك" class="input-field" required>
+                                <input type="text" id="service-name" class="input-field" required>
                             </div>
                             <div class="form-group">
                                 <label>المنصة</label>
@@ -171,27 +162,27 @@
                         </div>
 
                         <div class="form-group">
-                            <label>وصف الخدمة</label>
-                            <textarea id="service-desc" placeholder="أدخل وصف تفصيلي للخدمة" class="input-field" rows="3" required></textarea>
+                            <label>الوصف</label>
+                            <textarea id="service-desc" class="input-field" rows="3" required></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label>الأسعار (الكمية: السعر بالريال)</label>
-                            <div id="prices-container" class="prices-container"></div>
-                            <button type="button" onclick="addMorePrice()" class="add-price-btn">
-                                <i class="fas fa-plus"></i> أضف سعر آخر
+                            <label>الأسعار</label>
+                            <div id="prices-container"></div>
+                            <button type="button" onclick="addPriceInput()" class="add-price-btn">
+                                <i class="fas fa-plus"></i> أضف سعر
                             </button>
                         </div>
 
                         <div class="form-group">
-                            <label>صورة الخدمة</label>
+                            <label>الصورة</label>
                             <input type="file" id="service-image" accept="image/*" class="input-field">
                             <img id="image-preview" class="image-preview" style="display:none;">
                         </div>
 
                         <div class="form-actions">
                             <button type="submit" class="submit-btn">
-                                <i class="fas fa-save"></i> حفظ الخدمة
+                                <i class="fas fa-save"></i> حفظ
                             </button>
                             <button type="button" onclick="cancelServiceForm()" class="cancel-btn">
                                 <i class="fas fa-times"></i> إلغاء
@@ -200,13 +191,12 @@
                     </form>
                 </div>
 
-                <!-- Services Table -->
                 <div class="table-container">
-                    <table id="services-table" class="admin-table">
+                    <table class="admin-table">
                         <thead>
                             <tr>
                                 <th>الصورة</th>
-                                <th>اسم الخدمة</th>
+                                <th>الاسم</th>
                                 <th>المنصة</th>
                                 <th>الأسعار</th>
                                 <th>الإجراءات</th>
@@ -220,12 +210,12 @@
             <!-- Orders Section -->
             <section id="orders-section" class="admin-section" style="display:none;">
                 <div class="section-header">
-                    <h2><i class="fas fa-shopping-bag"></i> إدارة الطلبات</h2>
+                    <h2><i class="fas fa-shopping-bag"></i> الطلبات</h2>
                 </div>
 
                 <div class="filters-bar">
                     <select id="order-filter" onchange="filterOrders()" class="input-field">
-                        <option value="">جميع الطلبات</option>
+                        <option value="">الكل</option>
                         <option value="pending">معلقة</option>
                         <option value="completed">مكتملة</option>
                         <option value="cancelled">ملغاة</option>
@@ -233,15 +223,14 @@
                 </div>
 
                 <div class="table-container">
-                    <table id="orders-table" class="admin-table">
+                    <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>رقم الطلب</th>
+                                <th>#</th>
                                 <th>التاريخ</th>
-                                <th>اسم الحساب</th>
-                                <th>الخدمات</th>
+                                <th>العميل</th>
                                 <th>المبلغ</th>
-                                <th>طريقة الدفع</th>
+                                <th>الدفع</th>
                                 <th>الحالة</th>
                                 <th>الإجراءات</th>
                             </tr>
@@ -250,7 +239,6 @@
                     </table>
                 </div>
 
-                <!-- Order Details Modal -->
                 <div id="order-details-modal" class="modal" style="display:none;">
                     <div class="modal-content">
                         <button class="modal-close" onclick="closeOrderDetails()">
@@ -265,11 +253,10 @@
             <!-- Payment Methods Section -->
             <section id="payment-methods-section" class="admin-section" style="display:none;">
                 <div class="section-header">
-                    <h2><i class="fas fa-credit-card"></i> إدارة طرق الدفع</h2>
+                    <h2><i class="fas fa-credit-card"></i> طرق الدفع</h2>
                 </div>
 
                 <div class="payment-methods-grid">
-                    <!-- Bank Transfer -->
                     <div class="payment-method-card">
                         <div class="payment-method-header">
                             <i class="fas fa-university"></i>
@@ -278,15 +265,15 @@
                         <form onsubmit="savePaymentMethod(event, 'bank')">
                             <div class="form-group">
                                 <label>اسم البنك</label>
-                                <input type="text" id="bank-name" placeholder="مثال: بنك الراجحي" class="input-field">
+                                <input type="text" id="bank-name" class="input-field">
                             </div>
                             <div class="form-group">
                                 <label>رقم الحساب</label>
-                                <input type="text" id="bank-account" placeholder="رقم الحساب البنكي" class="input-field">
+                                <input type="text" id="bank-account" class="input-field">
                             </div>
                             <div class="form-group">
-                                <label>رقم الآيبان</label>
-                                <input type="text" id="bank-iban" placeholder="SA00 0000 0000 0000 0000" class="input-field">
+                                <label>الآيبان</label>
+                                <input type="text" id="bank-iban" class="input-field">
                             </div>
                             <button type="submit" class="submit-btn">
                                 <i class="fas fa-save"></i> حفظ
@@ -294,7 +281,6 @@
                         </form>
                     </div>
 
-                    <!-- Like Card -->
                     <div class="payment-method-card">
                         <div class="payment-method-header">
                             <i class="fas fa-mobile-alt"></i>
@@ -302,12 +288,12 @@
                         </div>
                         <form onsubmit="savePaymentMethod(event, 'like-card')">
                             <div class="form-group">
-                                <label>رمز الدفع / الكود</label>
-                                <input type="text" id="like-card-code" placeholder="أدخل رمز دفع لايك كارد" class="input-field">
+                                <label>رمز الدفع</label>
+                                <input type="text" id="like-card-code" class="input-field">
                             </div>
                             <div class="form-group">
-                                <label>رابط لايك كارد</label>
-                                <input type="url" id="like-card-url" placeholder="https://like.card..." class="input-field">
+                                <label>الرابط</label>
+                                <input type="url" id="like-card-url" class="input-field">
                             </div>
                             <button type="submit" class="submit-btn">
                                 <i class="fas fa-save"></i> حفظ
@@ -315,20 +301,19 @@
                         </form>
                     </div>
 
-                    <!-- Whatsapp -->
                     <div class="payment-method-card">
                         <div class="payment-method-header">
                             <i class="fab fa-whatsapp"></i>
-                            <h3>التواصل عبر واتس</h3>
+                            <h3>واتس اب</h3>
                         </div>
                         <form onsubmit="savePaymentMethod(event, 'whatsapp')">
                             <div class="form-group">
-                                <label>رقم الواتس اب</label>
-                                <input type="text" id="whatsapp-number" placeholder="+966594569011" class="input-field">
+                                <label>الرقم</label>
+                                <input type="text" id="whatsapp-number" class="input-field">
                             </div>
                             <div class="form-group">
-                                <label>رابط قناة الواتس</label>
-                                <input type="url" id="whatsapp-channel" placeholder="https://whatsapp.com/channel/..." class="input-field">
+                                <label>قناة الواتس</label>
+                                <input type="url" id="whatsapp-channel" class="input-field">
                             </div>
                             <button type="submit" class="submit-btn">
                                 <i class="fas fa-save"></i> حفظ
@@ -336,7 +321,6 @@
                         </form>
                     </div>
 
-                    <!-- Credit Card -->
                     <div class="payment-method-card">
                         <div class="payment-method-header">
                             <i class="fas fa-credit-card"></i>
@@ -344,8 +328,8 @@
                         </div>
                         <form onsubmit="savePaymentMethod(event, 'card')">
                             <div class="form-group">
-                                <label>رسالة للعملاء</label>
-                                <textarea id="card-message" placeholder="أدخل رسالة للعملاء حول الدفع ببطاقة" class="input-field" rows="3"></textarea>
+                                <label>رسالة</label>
+                                <textarea id="card-message" class="input-field" rows="3"></textarea>
                             </div>
                             <button type="submit" class="submit-btn">
                                 <i class="fas fa-save"></i> حفظ
@@ -366,31 +350,51 @@
                         <h3><i class="fas fa-globe"></i> معلومات الموقع</h3>
                         <div class="form-group">
                             <label>اسم الموقع</label>
-                            <input type="text" id="site-name" placeholder="خدمات التواصل" class="input-field" required>
+                            <input type="text" id="site-name" class="input-field" required>
                         </div>
                         <div class="form-group">
-                            <label>وصف الموقع</label>
-                            <textarea id="site-desc" placeholder="وصف موجز عن الموقع" class="input-field" rows="3"></textarea>
+                            <label>الوصف</label>
+                            <textarea id="site-desc" class="input-field" rows="3"></textarea>
                         </div>
                         <div class="form-group">
-                            <label>البريد الإلكتروني</label>
-                            <input type="email" id="site-email" placeholder="info@example.com" class="input-field">
+                            <label>البريد</label>
+                            <input type="email" id="site-email" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label>الهاتف</label>
+                            <input type="text" id="site-phone" class="input-field">
                         </div>
                     </div>
 
                     <div class="settings-group">
-                        <h3><i class="fas fa-credit-card"></i> الحد الأدنى للطلب</h3>
+                        <h3><i class="fab fa-facebook"></i> الروابط الاجتماعية</h3>
                         <div class="form-group">
-                            <label>الحد الأدنى للمشتريات (ر.س)</label>
-                            <input type="number" id="min-order" placeholder="0" class="input-field" min="0">
+                            <label>تيك توك</label>
+                            <input type="url" id="tiktok-link" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label>إنستغرام</label>
+                            <input type="url" id="instagram-link" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label>فيسبوك</label>
+                            <input type="url" id="facebook-link" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label>تويتر</label>
+                            <input type="url" id="twitter-link" class="input-field">
                         </div>
                     </div>
 
                     <div class="settings-group">
-                        <h3><i class="fas fa-exclamation"></i> الرسائل</h3>
+                        <h3><i class="fas fa-cog"></i> إعدادات أخرى</h3>
+                        <div class="form-group">
+                            <label>الحد الأدنى للطلب (ر.س)</label>
+                            <input type="number" id="min-order" class="input-field" min="0">
+                        </div>
                         <div class="form-group">
                             <label>رسالة الترحيب</label>
-                            <textarea id="welcome-message" placeholder="رسالة ترحيب للعملاء الجدد" class="input-field" rows="3"></textarea>
+                            <textarea id="welcome-message" class="input-field" rows="3"></textarea>
                         </div>
                     </div>
 
@@ -401,6 +405,9 @@
             </section>
         </div>
     </div>
+
+    <!-- Notification Container -->
+    <div id="notifications-container"></div>
 
     <script src="admin.js"></script>
 </body>

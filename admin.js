@@ -154,10 +154,33 @@ function checkAdminSession() {
 
 // ========== DASHBOARD ==========
 function loadDashboardData() {
+  // Load orders from localStorage
+  const savedOrders = localStorage.getItem("orders")
+  if (savedOrders) {
+    try {
+      orders = JSON.parse(savedOrders)
+      console.log("[v0] Orders loaded from localStorage:", orders)
+    } catch (e) {
+      console.error("[v0] Error parsing orders:", e)
+      orders = []
+    }
+  }
+
   const totalOrders = orders.length
   const completedOrders = orders.filter((o) => o.status === "completed").length
   const pendingOrders = orders.filter((o) => o.status === "pending").length
   const totalSales = orders.reduce((sum, o) => sum + (o.total || 0), 0)
+
+  console.log(
+    "[v0] Dashboard stats - Total:",
+    totalOrders,
+    "Completed:",
+    completedOrders,
+    "Pending:",
+    pendingOrders,
+    "Sales:",
+    totalSales,
+  )
 
   document.getElementById("total-orders").textContent = totalOrders
   document.getElementById("total-sales").textContent = totalSales.toFixed(2) + " ر.س"
@@ -201,22 +224,25 @@ function toggleSidebar() {
 }
 
 function showAdminSection(sectionName) {
-  document.querySelectorAll(".admin-section").forEach((section) => {
-    section.style.display = "none"
-  })
-  document.getElementById(sectionName + "-section").style.display = "block"
+  const sections = document.querySelectorAll(".admin-section")
+  sections.forEach((section) => (section.style.display = "none"))
 
-  document.querySelectorAll(".nav-btn").forEach((btn) => {
-    btn.classList.remove("active")
-  })
+  const buttons = document.querySelectorAll(".nav-btn")
+  buttons.forEach((btn) => btn.classList.remove("active"))
+
+  const sectionId = sectionName + "-section"
+  const section = document.getElementById(sectionId)
+  if (section) {
+    section.style.display = "block"
+  }
+
   event.target.classList.add("active")
 
-  if (sectionName === "services") {
-    loadServicesTable()
-  } else if (sectionName === "orders") {
-    loadOrdersTable()
-  } else if (sectionName === "payment-methods") {
-    loadPaymentMethodsData()
+  // Load specific data when section is opened
+  if (sectionName === "orders") {
+    renderOrdersTable()
+  } else if (sectionName === "settings") {
+    loadSettingsForm()
   } else if (sectionName === "dashboard") {
     loadDashboardData()
   }
@@ -242,7 +268,7 @@ function addPriceInput() {
   priceDiv.className = "price-input-group"
   priceDiv.innerHTML = `
     <input type="number" placeholder="الكمية" min="1" class="input-field" style="flex: 1;">
-    <input type="number" placeholder="السعر بالريال" min="0" step="0.01" class="input-field" style="flex: 1;">
+    <input type="number" placeholder="السعر (ر.س)" min="0" step="0.01" class="input-field" style="flex: 1;">
     <button type="button" onclick="this.parentElement.remove()" class="remove-btn">
       <i class="fas fa-trash"></i>
     </button>
@@ -342,7 +368,7 @@ function editService(serviceId) {
     priceDiv.className = "price-input-group"
     priceDiv.innerHTML = `
       <input type="number" placeholder="الكمية" min="1" value="${price.quantity}" class="input-field" style="flex: 1;">
-      <input type="number" placeholder="السعر بالريال" min="0" step="0.01" value="${price.price}" class="input-field" style="flex: 1;">
+      <input type="number" placeholder="السعر (ر.س)" min="0" step="0.01" value="${price.price}" class="input-field" style="flex: 1;">
       <button type="button" onclick="this.parentElement.remove()" class="remove-btn">
         <i class="fas fa-trash"></i>
       </button>
@@ -400,35 +426,38 @@ function loadServicesTable() {
 }
 
 // ========== ORDERS MANAGEMENT ==========
-function loadOrdersTable() {
+function renderOrdersTable() {
   const tbody = document.getElementById("orders-tbody")
   tbody.innerHTML = ""
 
-  if (orders.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">لا توجد طلبات</td></tr>'
-    return
+  // Load fresh orders from localStorage
+  const savedOrders = localStorage.getItem("orders")
+  if (savedOrders) {
+    try {
+      orders = JSON.parse(savedOrders)
+    } catch (e) {
+      orders = []
+    }
   }
 
-  orders.forEach((order) => {
+  console.log("[v0] Rendering orders table with", orders.length, "orders")
+
+  orders.forEach((order, index) => {
     const row = document.createElement("tr")
     row.innerHTML = `
-      <td>#${order.id}</td>
+      <td>${index + 1}</td>
       <td>${order.date}</td>
-      <td>${order.customerName}</td>
-      <td>${order.services.length} خدمة</td>
-      <td>${order.total.toFixed(2)} ر.س</td>
+      <td>${order.accountName}</td>
+      <td>${order.total.toFixed(2)} ${order.currency || "ر.س"}</td>
       <td>${order.paymentMethod}</td>
       <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
       <td>
         <button onclick="viewOrderDetails(${order.id})" class="action-btn view-btn" title="عرض">
           <i class="fas fa-eye"></i>
         </button>
-        <select onchange="updateOrderStatus(${order.id}, this.value)" class="input-field" style="width: 120px;">
-          <option value="">غير الحالة</option>
-          <option value="pending">معلقة</option>
-          <option value="completed">مكتملة</option>
-          <option value="cancelled">ملغاة</option>
-        </select>
+        <button onclick="updateOrderStatus(${order.id})" class="action-btn edit-btn" title="تحديث">
+          <i class="fas fa-edit"></i>
+        </button>
         <button onclick="deleteOrder(${order.id})" class="action-btn delete-btn" title="حذف">
           <i class="fas fa-trash"></i>
         </button>
@@ -440,69 +469,73 @@ function loadOrdersTable() {
 
 function viewOrderDetails(orderId) {
   const order = orders.find((o) => o.id === orderId)
-  if (!order) return
+  if (!order) {
+    showNotification("الطلب غير موجود", "error")
+    return
+  }
 
-  const servicesDetails = order.services
-    .map((s) => `<li>${s.name} (${s.quantity}) - ${s.price.toFixed(2)} ر.س</li>`)
+  const servicesHtml = order.services
+    .map(
+      (s) => `
+    <div style="padding: 0.5rem; border-bottom: 1px solid var(--border);">
+      <p><strong>${s.serviceName}</strong> - ${s.platform}</p>
+      <p>الكمية: ${s.quantity} × ${s.pricePerUnit} = ${s.subtotal}</p>
+    </div>
+  `,
+    )
     .join("")
 
-  const detailsHTML = `
-    <div class="order-details-view">
-      <p><strong>رقم الطلب:</strong> #${order.id}</p>
-      <p><strong>اسم العميل:</strong> ${order.customerName}</p>
-      <p><strong>البريد الإلكتروني:</strong> ${order.email}</p>
+  const modal = document.getElementById("order-details-modal")
+  const content = document.getElementById("order-details-content")
+  content.innerHTML = `
+    <div style="padding: 1rem;">
+      <h3>تفاصيل الطلب #${order.id}</h3>
       <p><strong>التاريخ:</strong> ${order.date}</p>
-      <p><strong>الخدمات:</strong></p>
-      <ul>${servicesDetails}</ul>
-      <p><strong>الإجمالي:</strong> ${order.total.toFixed(2)} ر.س</p>
+      <p><strong>اسم الحساب:</strong> ${order.accountName}</p>
+      <p><strong>البريد:</strong> ${order.email}</p>
+      <p><strong>الهاتف:</strong> ${order.phone}</p>
       <p><strong>طريقة الدفع:</strong> ${order.paymentMethod}</p>
-      <p><strong>الحالة:</strong> <span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></p>
+      <p><strong>الحالة:</strong> ${getStatusText(order.status)}</p>
+      <p><strong>الملاحظات:</strong> ${order.notes || "لا توجد ملاحظات"}</p>
+      <h4>الخدمات:</h4>
+      <div>${servicesHtml}</div>
+      <p style="font-size: 1.2rem; font-weight: bold; border-top: 2px solid var(--primary); padding-top: 1rem; margin-top: 1rem;">
+        الإجمالي: ${order.total} ${order.currency}
+      </p>
     </div>
   `
-
-  document.getElementById("order-details-content").innerHTML = detailsHTML
-  document.getElementById("order-details-modal").style.display = "flex"
+  modal.style.display = "flex"
 }
 
-function closeOrderDetails() {
-  document.getElementById("order-details-modal").style.display = "none"
-}
+function updateOrderStatus(orderId) {
+  const order = orders.find((o) => o.id === orderId)
+  if (!order) return
 
-function updateOrderStatus(orderId, status) {
-  if (!status) return
-  const orderIndex = orders.findIndex((o) => o.id === orderId)
-  if (orderIndex !== -1) {
-    orders[orderIndex].status = status
-    saveAllData()
-    loadOrdersTable()
-    showNotification("تم تحديث حالة الطلب بنجاح", "success")
+  const newStatus = prompt("اختر الحالة الجديدة:\n1. pending\n2. completed\n3. cancelled", order.status)
+  if (!newStatus) return
+
+  if (!["pending", "completed", "cancelled"].includes(newStatus)) {
+    showNotification("حالة غير صحيحة", "error")
+    return
   }
+
+  order.status = newStatus
+  localStorage.setItem("orders", JSON.stringify(orders))
+  console.log("[v0] Order status updated:", order.id, newStatus)
+  showNotification("تم تحديث حالة الطلب بنجاح", "success")
+  renderOrdersTable()
+  loadDashboardData()
 }
 
 function deleteOrder(orderId) {
-  if (confirm("هل أنت متأكد من حذف هذا الطلب؟")) {
-    orders = orders.filter((o) => o.id !== orderId)
-    saveAllData()
-    loadOrdersTable()
-    loadDashboardData()
-    showNotification("تم حذف الطلب بنجاح", "success")
-  }
-}
+  if (!confirm("هل أنت متأكد من حذف هذا الطلب؟")) return
 
-function filterOrders() {
-  const filter = document.getElementById("order-filter").value
-  const tbody = document.getElementById("orders-tbody")
-  const rows = tbody.querySelectorAll("tr")
-
-  rows.forEach((row) => {
-    if (filter === "") {
-      row.style.display = ""
-    } else {
-      const statusBadge = row.querySelector(".status-badge")
-      const orderStatus = statusBadge ? statusBadge.className.match(/status-(\w+)/)[1] : ""
-      row.style.display = orderStatus === filter ? "" : "none"
-    }
-  })
+  orders = orders.filter((o) => o.id !== orderId)
+  localStorage.setItem("orders", JSON.stringify(orders))
+  console.log("[v0] Order deleted:", orderId)
+  showNotification("تم حذف الطلب بنجاح", "success")
+  renderOrdersTable()
+  loadDashboardData()
 }
 
 // ========== PAYMENT METHODS ==========
@@ -566,40 +599,38 @@ function savePaymentMethod(event, method) {
 
 // ========== SETTINGS ==========
 function loadSettingsForm() {
-  document.getElementById("site-name").value = siteSettings.siteName
-  document.getElementById("site-desc").value = siteSettings.siteDesc
-  document.getElementById("site-email").value = siteSettings.siteEmail
+  document.getElementById("site-name").value = siteSettings.siteName || ""
+  document.getElementById("site-desc").value = siteSettings.siteDesc || ""
+  document.getElementById("site-email").value = siteSettings.siteEmail || ""
   document.getElementById("site-phone").value = siteSettings.sitePhone || ""
-  document.getElementById("min-order").value = siteSettings.minOrder
-  document.getElementById("welcome-message").value = siteSettings.welcomeMessage
-
-  if (siteSettings.socialLinks) {
-    document.getElementById("tiktok-link").value = siteSettings.socialLinks.tiktok || ""
-    document.getElementById("instagram-link").value = siteSettings.socialLinks.instagram || ""
-    document.getElementById("facebook-link").value = siteSettings.socialLinks.facebook || ""
-    document.getElementById("twitter-link").value = siteSettings.socialLinks.twitter || ""
-  }
+  document.getElementById("min-order").value = siteSettings.minOrder || 0
+  document.getElementById("welcome-message").value = siteSettings.welcomeMessage || ""
+  document.getElementById("tiktok-link").value = siteSettings.socialLinks?.tiktok || ""
+  document.getElementById("instagram-link").value = siteSettings.socialLinks?.instagram || ""
+  document.getElementById("facebook-link").value = siteSettings.socialLinks?.facebook || ""
+  document.getElementById("twitter-link").value = siteSettings.socialLinks?.twitter || ""
 }
 
 function saveSettings(event) {
   event.preventDefault()
 
   siteSettings = {
-    siteName: document.getElementById("site-name").value.trim(),
-    siteDesc: document.getElementById("site-desc").value.trim(),
-    siteEmail: document.getElementById("site-email").value.trim(),
-    sitePhone: document.getElementById("site-phone").value.trim(),
-    minOrder: Number.parseFloat(document.getElementById("min-order").value) || 0,
-    welcomeMessage: document.getElementById("welcome-message").value.trim(),
+    siteName: document.getElementById("site-name").value,
+    siteDesc: document.getElementById("site-desc").value,
+    siteEmail: document.getElementById("site-email").value,
+    sitePhone: document.getElementById("site-phone").value,
+    minOrder: Number.parseInt(document.getElementById("min-order").value) || 0,
+    welcomeMessage: document.getElementById("welcome-message").value,
     socialLinks: {
-      tiktok: document.getElementById("tiktok-link").value.trim(),
-      instagram: document.getElementById("instagram-link").value.trim(),
-      facebook: document.getElementById("facebook-link").value.trim(),
-      twitter: document.getElementById("twitter-link").value.trim(),
+      tiktok: document.getElementById("tiktok-link").value,
+      instagram: document.getElementById("instagram-link").value,
+      facebook: document.getElementById("facebook-link").value,
+      twitter: document.getElementById("twitter-link").value,
     },
   }
 
-  saveAllData()
+  localStorage.setItem("siteSettings", JSON.stringify(siteSettings))
+  console.log("[v0] Settings saved:", siteSettings)
   showNotification("تم حفظ الإعدادات بنجاح", "success")
 }
 
