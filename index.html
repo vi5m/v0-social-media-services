@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خدمات التواصل - بيع خدمات وسائل التواصل الاجتماعي</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-rocket"></i> خدمات التواصل
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link">الرئيسية</a>
+                <a href="#services" class="nav-link">الخدمات</a>
+                <a href="about.html" class="nav-link">عننا</a>
+                <a href="terms.html" class="nav-link">الشروط</a>
+                <a href="contact.html" class="nav-link">تواصل</a>
+                <button class="cart-btn" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i> السلة <span id="cart-count" class="cart-count">0</span>
+                </button>
+                <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="auth-btn" onclick="toggleAuthMenu()">
+                    <i class="fas fa-user"></i> حسابي
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">خدمات وسائل التواصل الاجتماعي</h1>
+                <p class="hero-subtitle">احصل على متابعين حقيقيين وزيادة تفاعلك على جميع المنصات</p>
+                <div class="hero-buttons">
+                    <button class="cta-btn primary" onclick="scrollToServices()">اكتشف الخدمات</button>
+                    <button class="cta-btn secondary" onclick="openModal('auth-modal')">ابدأ الآن</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-decoration">
+                    <i class="fas fa-cube"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="services">
+            <div class="section-header">
+                <h2>خدماتنا المميزة</h2>
+                <p>اختر من بين مجموعة واسعة من الخدمات المتخصصة</p>
+            </div>
+
+            <!-- TikTok Section -->
+            <div class="platform-section">
+                <div class="platform-banner-container">
+                    <img src="/images/img-20260113-wa0005.jpg" alt="خدمات التيك توك" class="platform-banner">
+                </div>
+                <div id="tiktok-services" class="services-grid">
+                    <!-- TikTok services will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Instagram Section -->
+            <div class="platform-section">
+                <div class="platform-banner-container">
+                    <img src="/images/img-20260113-wa0003.jpg" alt="خدمات الإنستغرام" class="platform-banner">
+                </div>
+                <div id="instagram-services" class="services-grid">
+                    <!-- Instagram services will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Facebook Section -->
+            <div class="platform-section">
+                <div class="platform-banner-container">
+                    <img src="/images/img-20260113-wa0004.jpg" alt="خدمات الفيسبوك" class="platform-banner">
+                </div>
+                <div id="facebook-services" class="services-grid">
+                    <!-- Facebook services will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <h2>لماذا نختارنا؟</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>آمن وموثوق</h3>
+                    <p>نضمن حماية بيانات عملائنا والتزامنا بأعلى معايير الأمان</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-zap"></i>
+                    </div>
+                    <h3>سريع وفعال</h3>
+                    <p>تسليم فوري للخدمات وتحديثات فورية على حسابك</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>دعم 24/7</h3>
+                    <p>فريق دعم متواجد طوال الوقت لمساعدتك</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <h3>أسعار منخفضة</h3>
+                    <p>أفضل أسعار مضمونة مع عروض خاصة للعملاء المنتظمين</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('cart-modal')">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2><i class="fas fa-shopping-cart"></i> سلة التسوق</h2>
+            <div id="cart-items" class="cart-items">
+                <!-- Cart items will be loaded here -->
+            </div>
+            <div class="cart-summary">
+                <h3>ملخص الطلب</h3>
+                <div class="currency-selector">
+                    <label>العملة:</label>
+                    <select id="currency-select" onchange="updateCartTotal()">
+                        <option value="SAR">الريال السعودي (ر.س)</option>
+                        <option value="AED">الدرهم الإماراتي (د.إ)</option>
+                        <option value="USD">الدولار الأمريكي ($)</option>
+                        <option value="OMR">الريال العماني (ر.ع.)</option>
+                    </select>
+                </div>
+                <div class="cart-total">
+                    <span>الإجمالي:</span>
+                    <span id="cart-total">0</span>
+                    <span id="total-currency">ر.س</span>
+                </div>
+                <button class="checkout-btn" onclick="proceedToCheckout()">انتقل للدفع</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content auth-modal">
+            <button class="modal-close" onclick="closeModal('auth-modal')">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">تسجيل دخول</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">إنشاء حساب</button>
+            </div>
+
+            <div id="login-form" class="auth-form active">
+                <h2>تسجيل الدخول</h2>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="login-email" class="input-field" placeholder="أدخل بريدك الإلكتروني">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="login-password" class="input-field" placeholder="أدخل كلمة المرور">
+                </div>
+                <button onclick="login()" class="btn btn-primary">دخول</button>
+            </div>
+
+            <div id="register-form" class="auth-form">
+                <h2>إنشاء حساب جديد</h2>
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="register-name" class="input-field" placeholder="أدخل اسمك الكامل">
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="register-email" class="input-field" placeholder="أدخل بريدك الإلكتروني">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="register-password" class="input-field" placeholder="أدخل كلمة المرور">
+                </div>
+                <div class="form-group">
+                    <label>تأكيد كلمة المرور</label>
+                    <input type="password" id="register-confirm" class="input-field" placeholder="أعد كتابة كلمة المرور">
+                </div>
+                <button onclick="register()" class="btn btn-primary">إنشاء حساب</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Page -->
+    <div id="checkout-page" class="checkout-page" style="display:none;">
+        <button class="back-to-cart-btn" onclick="backToCart()">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </button>
+        <div class="checkout-container">
+            <h2><i class="fas fa-credit-card"></i> إتمام عملية الشراء</h2>
+            
+            <div class="checkout-layout">
+                <!-- Order Summary -->
+                <div class="checkout-section order-summary-section">
+                    <h3>ملخص الطلب</h3>
+                    <div id="checkout-items" class="checkout-items"></div>
+                    <div class="checkout-total">
+                        <span>المجموع:</span>
+                        <span id="checkout-total">0</span>
+                        <span id="checkout-currency">ر.س</span>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="checkout-section payment-section">
+                    <h3>طريقة الدفع</h3>
+                    <div class="payment-methods">
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="card" checked>
+                            <div class="payment-option-content">
+                                <i class="fas fa-credit-card"></i>
+                                <div>
+                                    <strong>بطاقة ائتمان / ديبت</strong>
+                                    <small>آمنة وسريعة</small>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="transfer">
+                            <div class="payment-option-content">
+                                <i class="fas fa-university"></i>
+                                <div>
+                                    <strong>تحويل بنكي</strong>
+                                    <small>السعودية، الإمارات، عمان</small>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="like-card">
+                            <div class="payment-option-content">
+                                <i class="fas fa-mobile-alt"></i>
+                                <div>
+                                    <strong>لايك كارد</strong>
+                                    <small>دفع فوري وآمن</small>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="whatsapp">
+                            <div class="payment-option-content">
+                                <i class="fab fa-whatsapp"></i>
+                                <div>
+                                    <strong>تواصل عبر واتس</strong>
+                                    <small>للاستفسارات والطلبات</small>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Payment Forms -->
+                    <div id="card-payment" class="payment-form">
+                        <h4>بيانات البطاقة</h4>
+                        <div class="form-group">
+                            <label>رقم البطاقة</label>
+                            <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" class="input-field">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>تاريخ الانتهاء</label>
+                                <input type="text" placeholder="MM/YY" maxlength="5" class="input-field">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="text" placeholder="***" maxlength="3" class="input-field">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="transfer-payment" class="payment-form" style="display:none;">
+                        <h4>بيانات التحويل البنكي</h4>
+                        <div class="bank-info">
+                            <p><strong>اسم البنك:</strong> <span id="bank-name">سيتم تحديده من الأدمن</span></p>
+                            <p><strong>رقم الحساب:</strong> <span id="bank-account">سيتم تحديده من الأدمن</span></p>
+                            <p><strong>رقم الآيبان:</strong> <span id="bank-iban">سيتم تحديده من الأدمن</span></p>
+                            <p class="note">يرجى التأكد من صحة البيانات قبل التحويل</p>
+                        </div>
+                    </div>
+
+                    <div id="like-card-payment" class="payment-form" style="display:none;">
+                        <h4>دفع عبر لايك كارد</h4>
+                        <div class="card-info">
+                            <p><strong>رمز الدفع:</strong> <span id="like-card-code">سيتم تحديده من الأدمن</span></p>
+                            <p class="note">يرجى إدخال رمز الدفع في تطبيق لايك كارد</p>
+                        </div>
+                    </div>
+
+                    <div id="whatsapp-payment" class="payment-form" style="display:none;">
+                        <h4>التواصل عبر واتس اب</h4>
+                        <p>سيتم تحويلك للتواصل عبر واتس اب لإتمام الدفع</p>
+                        <button class="btn btn-whatsapp" onclick="contactViaWhatsapp()">
+                            <i class="fab fa-whatsapp"></i> فتح واتس اب
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Order Details -->
+                <div class="checkout-section order-details-section">
+                    <h3>بيانات الطلب</h3>
+                    <div class="form-group">
+                        <label>اسم المستخدم أو الحساب</label>
+                        <input type="text" id="order-account" placeholder="اسم حسابك على المنصة" class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" id="order-email" placeholder="بريدك الإلكتروني" class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الواتس اب</label>
+                        <input type="tel" id="order-phone" placeholder="+966..." class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <label>ملاحظات إضافية</label>
+                        <textarea id="order-notes" placeholder="أي ملاحظات على الطلب" class="input-field" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-footer">
+                <button onclick="completeOrder()" class="btn btn-success btn-large">
+                    <i class="fas fa-check"></i> تأكيد الطلب
+                </button>
+                <button onclick="backToCart()" class="btn btn-secondary btn-large">
+                    <i class="fas fa-arrow-right"></i> رجوع للسلة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>خدمات التواصل</h4>
+                <p>متخصصون في بيع خدمات وسائل التواصل الاجتماعي بأفضل الأسعار والخدمات</p>
+            </div>
+            <div class="footer-section">
+                <h4>الروابط السريعة</h4>
+                <ul>
+                    <li><a href="#home">الرئيسية</a></li>
+                    <li><a href="#services">الخدمات</a></li>
+                    <li><a href="about.html">عننا</a></li>
+                    <li><a href="contact.html">تواصل</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>تواصل معنا</h4>
+                <p><i class="fas fa-whatsapp"></i> <a href="https://wa.me/970594569011">+970 594 569 011</a></p>
+                <p><i class="fab fa-telegram"></i> <a href="https://t.me/example">@example</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 خدمات التواصل الاجتماعي. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <!-- Auth Menu Dropdown -->
+    <div id="auth-menu" class="auth-menu">
+        <button onclick="showLoginForm()"><i class="fas fa-sign-in-alt"></i> تسجيل دخول</button>
+        <button onclick="showRegisterForm()"><i class="fas fa-user-plus"></i> إنشاء حساب</button>
+        <hr>
+        <button onclick="goToAdmin()"><i class="fas fa-lock"></i> لوحة الأدمن</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تواصل معنا</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-rocket"></i> خدمات التواصل
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="about.html" class="nav-link">عننا</a>
+                <a href="terms.html" class="nav-link">الشروط</a>
+                <a href="contact.html" class="nav-link active">تواصل</a>
+                <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="contact-hero">
+            <h1>تواصل معنا</h1>
+            <p>نحن هنا للإجابة على جميع استفساراتك</p>
+        </section>
+
+        <section class="contact-container" style="max-width: 1200px; margin: 4rem auto; padding: 0 2rem;">
+            <div class="contact-grid">
+                <!-- Contact Form -->
+                <div class="contact-form-section">
+                    <h2><i class="fas fa-envelope"></i> أرسل لنا رسالة</h2>
+                    <form onsubmit="sendMessage(event)">
+                        <div class="form-group">
+                            <label>الاسم</label>
+                            <input type="text" placeholder="أدخل اسمك الكامل" class="input-field" required>
+                        </div>
+                        <div class="form-group">
+                            <label>البريد الإلكتروني</label>
+                            <input type="email" placeholder="أدخل بريدك الإلكتروني" class="input-field" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الموضوع</label>
+                            <input type="text" placeholder="اختر موضوع الرسالة" class="input-field" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الرسالة</label>
+                            <textarea placeholder="اكتب رسالتك" class="input-field" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> إرسال الرسالة
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="contact-info-section">
+                    <h2><i class="fas fa-info-circle"></i> معلومات التواصل</h2>
+
+                    <div class="contact-info-card">
+                        <div class="info-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <h3>واتس اب</h3>
+                        <p>الرقم: <a href="https://wa.me/970594569011">+970 594 569 011</a></p>
+                        <p class="info-desc">متاح 24/7 للاستفسارات والطلبات</p>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h3>قناة واتس اب</h3>
+                        <p><a href="https://whatsapp.com/channel/0029VbCXW248qIzki3MIvE44" target="_blank">قناة متجر فهد</a></p>
+                        <p class="info-desc">اشترك للحصول على آخر العروض والتحديثات</p>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>البريد الإلكتروني</h3>
+                        <p><a href="mailto:info@example.com">info@example.com</a></p>
+                        <p class="info-desc">سنرد عليك في أقرب وقت ممكن</p>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>ساعات العمل</h3>
+                        <p>السبت - الخميس: 9:00 ص - 9:00 م</p>
+                        <p class="info-desc">الجمعة: مغلق</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <div style="max-width: 900px; margin: 0 auto; padding: 0 2rem;">
+                <h2 style="text-align: center; margin-bottom: 3rem;">الأسئلة الشائعة</h2>
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h3>كيف أطلب الخدمة؟</h3>
+                        <p>ببساطة أضف الخدمات المطلوبة للسلة وأتمم عملية الشراء.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>كم من الوقت يستغرق التسليم؟</h3>
+                        <p>معظم الخدمات يتم تسليمها خلال 24 ساعة من الطلب.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>هل الخدمات آمنة؟</h3>
+                        <p>نعم، جميع خدماتنا آمنة تماماً ولن تضر حسابك.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>هل يمكن استرجاع الأموال؟</h3>
+                        <p>نعم، إذا لم تتسلم الخدمة بالكامل يمكنك استرجاع المبلغ.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>خدمات التواصل</h4>
+                <p>متخصصون في بيع خدمات وسائل التواصل الاجتماعي بأفضل الأسعار والخدمات</p>
+            </div>
+            <div class="footer-section">
+                <h4>الروابط السريعة</h4>
+                <ul>
+                    <li><a href="index.html">الرئيسية</a></li>
+                    <li><a href="about.html">عننا</a></li>
+                    <li><a href="terms.html">الشروط</a></li>
+                    <li><a href="contact.html">تواصل</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>تواصل معنا</h4>
+                <p><i class="fas fa-whatsapp"></i> <a href="https://wa.me/970594569011">+970 594 569 011</a></p>
+                <p><i class="fas fa-envelope"></i> <a href="mailto:info@example.com">info@example.com</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 خدمات التواصل الاجتماعي. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <style>
+        .contact-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .contact-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .contact-form-section,
+        .contact-info-section {
+            background: var(--light-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        body.dark-mode .contact-form-section,
+        body.dark-mode .contact-info-section {
+            background: var(--dark-secondary);
+            border-color: var(--dark-tertiary);
+        }
+
+        .contact-form-section h2,
+        .contact-info-section h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .contact-info-card {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-right: 4px solid var(--primary);
+        }
+
+        body.dark-mode .contact-info-card {
+            background: var(--dark-tertiary);
+        }
+
+        .info-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .contact-info-card h3 {
+            color: var(--text-dark);
+            margin-bottom: 0.8rem;
+        }
+
+        .contact-info-card p {
+            color: var(--text-gray);
+            margin-bottom: 0.4rem;
+        }
+
+        .info-desc {
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .contact-info-card a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .faq-section {
+            background: var(--light-secondary);
+            padding: 4rem 2rem;
+            margin-top: 3rem;
+        }
+
+        body.dark-mode .faq-section {
+            background: var(--dark-secondary);
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .faq-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        body.dark-mode .faq-item {
+            background: var(--dark-tertiary);
+        }
+
+        .faq-item h3 {
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .faq-item p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script>
+        function sendMessage(event) {
+            event.preventDefault()
+            showNotification("شكراً لرسالتك، سنرد عليك قريباً", "success")
+            event.target.reset()
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.createElement("div")
+            notification.className = `notification notification-${type}`
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas fa-${type === "success" ? "check-circle" : "info-circle"}"></i>
+                    <span>${message}</span>
+                </div>
+            `
+            document.body.appendChild(notification)
+            setTimeout(() => notification.remove(), 3000)
+        }
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

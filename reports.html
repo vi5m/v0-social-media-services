@@ -1,0 +1,71 @@
+<!-- صفحة التقارير والإحصائيات -->
+
+<section id="reports-section" class="admin-section" style="display:none;">
+    <h2>التقارير والإحصائيات</h2>
+
+    <div class="reports-filters">
+        <label>نطاق التاريخ:</label>
+        <input type="date" id="report-start-date" class="input-field">
+        <input type="date" id="report-end-date" class="input-field">
+        <button onclick="generateReport()" class="submit-btn">توليد التقرير</button>
+        <button onclick="exportReport()" class="submit-btn">تصدير PDF</button>
+    </div>
+
+    <div class="reports-container">
+        <!-- Sales Report -->
+        <div class="report-section">
+            <h3>تقرير المبيعات</h3>
+            <div class="report-grid">
+                <div class="report-item">
+                    <label>إجمالي المبيعات</label>
+                    <p class="report-value" id="total-sales">0 ر.س</p>
+                </div>
+                <div class="report-item">
+                    <label>عدد الطلبات</label>
+                    <p class="report-value" id="total-orders-report">0</p>
+                </div>
+                <div class="report-item">
+                    <label>متوسط الطلب</label>
+                    <p class="report-value" id="avg-order">0 ر.س</p>
+                </div>
+                <div class="report-item">
+                    <label>معدل التحويل</label>
+                    <p class="report-value" id="conversion-rate">0%</p>
+                </div>
+            </div>
+            <canvas id="sales-chart" style="margin-top: 1rem;"></canvas>
+        </div>
+
+        <!-- Services Report -->
+        <div class="report-section">
+            <h3>تقرير الخدمات الأكثر طلباً</h3>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>الخدمة</th>
+                        <th>عدد الطلبات</th>
+                        <th>إجمالي الإيرادات</th>
+                        <th>النسبة</th>
+                    </tr>
+                </thead>
+                <tbody id="services-report-body"></tbody>
+            </table>
+            <canvas id="services-chart" style="margin-top: 1rem;"></canvas>
+        </div>
+
+        <!-- Daily Report -->
+        <div class="report-section">
+            <h3>المبيعات اليومية</h3>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>عدد الطلبات</th>
+                        <th>الإيرادات</th>
+                    </tr>
+                </thead>
+                <tbody id="daily-report-body"></tbody>
+            </table>
+        </div>
+    </div>
+</section>

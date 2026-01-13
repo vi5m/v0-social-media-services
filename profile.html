@@ -1,0 +1,61 @@
+<!-- صفحة الملف الشخصي للعميل -->
+
+<div id="user-profile" class="user-profile" style="display:none;">
+    <div class="profile-header">
+        <img id="profile-avatar" class="profile-avatar" alt="الملف الشخصي">
+        <div class="profile-info">
+            <h2 id="profile-name"></h2>
+            <p id="profile-email"></p>
+            <p id="profile-member-since"></p>
+        </div>
+    </div>
+
+    <div class="profile-nav">
+        <button onclick="showProfileTab('orders')" class="profile-nav-btn active">الطلبات</button>
+        <button onclick="showProfileTab('favorites')" class="profile-nav-btn">المفضلة</button>
+        <button onclick="showProfileTab('settings')" class="profile-nav-btn">الإعدادات</button>
+    </div>
+
+    <!-- Orders Tab -->
+    <div id="orders-tab" class="profile-tab">
+        <h3>طلباتي</h3>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>رقم الطلب</th>
+                    <th>التاريخ</th>
+                    <th>الخدمات</th>
+                    <th>المبلغ</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody id="user-orders-body"></tbody>
+        </table>
+    </div>
+
+    <!-- Favorites Tab -->
+    <div id="favorites-tab" class="profile-tab" style="display:none;">
+        <h3>خدماتي المفضلة</h3>
+        <div id="favorites-grid" class="services-grid"></div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="settings-tab" class="profile-tab" style="display:none;">
+        <h3>إعدادات الحساب</h3>
+        <div class="settings-section">
+            <label>الاسم الكامل</label>
+            <input type="text" id="settings-name" class="input-field">
+        </div>
+
+        <div class="settings-section">
+            <h4>تغيير كلمة المرور</h4>
+            <input type="password" id="old-password" placeholder="كلمة المرور القديمة" class="input-field">
+            <input type="password" id="new-password" placeholder="كلمة المرور الجديدة" class="input-field">
+            <input type="password" id="confirm-password" placeholder="تأكيد كلمة المرور" class="input-field">
+            <button onclick="changePassword()" class="submit-btn">تغيير كلمة المرور</button>
+        </div>
+
+        <button onclick="saveProfile()" class="submit-btn">حفظ التغييرات</button>
+        <button onclick="logoutUser()" class="cancel-btn">تسجيل خروج</button>
+    </div>
+</div>
