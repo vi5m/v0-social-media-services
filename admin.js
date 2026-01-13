@@ -1,24 +1,45 @@
-// ========== ADMIN STATE ==========
+// ========== ADMIN STATE & INITIALIZATION ==========
 let adminUser = null
 let services = []
 let orders = []
+let users = []
 let paymentMethods = {
-  bankName: "بنك الراجحي",
-  bankAccount: "XXXXXXXXXXXX",
-  bankIban: "SA00 0000 0000 0000 0000 0000",
-  likeCardCode: "XXXXXXXXXXXX",
-  likeCardUrl: "",
-  whatsappNumber: "+966594569011",
-  whatsappChannel: "https://whatsapp.com/channel/0029VbCXW248qIzki3MIvE44",
-  cardMessage: "يرجى الاتصال بنا لمعرفة تفاصيل الدفع ببطاقة ائتمان",
+  bank: {
+    enabled: true,
+    name: "بنك الراجحي",
+    account: "1234567890",
+    iban: "SA00 0000 0000 0000 0000",
+  },
+  likeCard: {
+    enabled: true,
+    code: "XXXXXXXXXXXX",
+    url: "https://like.card",
+  },
+  whatsapp: {
+    enabled: true,
+    number: "+966594569011",
+    channel: "https://whatsapp.com/channel/0029VbCXW248qIzki3MIvE44",
+  },
+  card: {
+    enabled: true,
+    message: "يرجى الاتصال بنا للدفع ببطاقة ائتمان",
+  },
 }
 let siteSettings = {
-  siteName: "خدمات التواصل",
-  siteDesc: "متخصصون في بيع خدمات وسائل التواصل الاجتماعي",
+  siteName: "خدمات التواصل الاجتماعي",
+  siteDesc: "متخصصون في بيع خدمات التواصل",
   siteEmail: "info@example.com",
+  sitePhone: "+966594569011",
   minOrder: 0,
   welcomeMessage: "مرحباً بك في خدماتنا",
+  socialLinks: {
+    tiktok: "https://tiktok.com/@yourusername",
+    instagram: "https://instagram.com/yourusername",
+    facebook: "https://facebook.com/yourusername",
+    twitter: "https://twitter.com/yourusername",
+  },
 }
+
 let isAdminDarkMode = false
 let editingServiceId = null
 
@@ -27,12 +48,20 @@ const adminCredentials = {
   password: "admin123",
 }
 
+// ========== INITIALIZATION ==========
+document.addEventListener("DOMContentLoaded", () => {
+  loadAdminTheme()
+  loadAllAdminData()
+  checkAdminSession()
+})
+
 // ========== THEME MANAGEMENT ==========
 function toggleAdminTheme() {
   isAdminDarkMode = !isAdminDarkMode
-  document.body.classList.toggle("dark-mode")
+  document.body.classList.toggle("dark-mode", isAdminDarkMode)
   localStorage.setItem("adminTheme", isAdminDarkMode ? "dark" : "light")
   updateAdminThemeIcon()
+  showNotification("تم تغيير المظهر بنجاح", "success")
 }
 
 function updateAdminThemeIcon() {
@@ -51,32 +80,26 @@ function loadAdminTheme() {
   }
 }
 
-// ========== DATA MANAGEMENT ==========
-function loadAdminData() {
+// ========== DATA LOADING ==========
+function loadAllAdminData() {
   const savedServices = localStorage.getItem("services")
   const savedOrders = localStorage.getItem("orders")
+  const savedUsers = localStorage.getItem("users")
   const savedPaymentMethods = localStorage.getItem("paymentMethods")
   const savedSettings = localStorage.getItem("siteSettings")
 
   if (savedServices) services = JSON.parse(savedServices)
   if (savedOrders) orders = JSON.parse(savedOrders)
+  if (savedUsers) users = JSON.parse(savedUsers)
   if (savedPaymentMethods) paymentMethods = JSON.parse(savedPaymentMethods)
   if (savedSettings) siteSettings = JSON.parse(savedSettings)
 }
 
-function saveServices() {
+function saveAllData() {
   localStorage.setItem("services", JSON.stringify(services))
-}
-
-function saveOrders() {
   localStorage.setItem("orders", JSON.stringify(orders))
-}
-
-function savePaymentMethods() {
+  localStorage.setItem("users", JSON.stringify(users))
   localStorage.setItem("paymentMethods", JSON.stringify(paymentMethods))
-}
-
-function saveSiteSettings() {
   localStorage.setItem("siteSettings", JSON.stringify(siteSettings))
 }
 
@@ -87,109 +110,78 @@ function adminLogin(event) {
   const password = document.getElementById("admin-password").value.trim()
 
   if (username === adminCredentials.username && password === adminCredentials.password) {
-    adminUser = { username, loginTime: new Date().toLocaleString("ar-SA") }
+    adminUser = {
+      username,
+      loginTime: new Date().toLocaleString("ar-SA"),
+    }
     localStorage.setItem("adminUser", JSON.stringify(adminUser))
-    showAdminDashboard()
-    showNotification("تم الدخول بنجاح", "success")
+    localStorage.setItem("adminLoggedIn", "true")
+    document.getElementById("admin-login").style.display = "none"
+    document.getElementById("admin-dashboard").style.display = "flex"
+    document.getElementById("admin-name").textContent = username
+    loadDashboardData()
+    showNotification("مرحباً بك في لوحة التحكم", "success")
   } else {
-    document.getElementById("login-error").textContent = "اسم المستخدم أو كلمة المرور غير صحيحة"
+    document.getElementById("login-error").textContent = "بيانات المستخدم غير صحيحة"
     showNotification("فشل تسجيل الدخول", "error")
   }
 }
 
 function adminLogout() {
-  if (confirm("هل تريد تسجيل الخروج؟")) {
-    adminUser = null
-    localStorage.removeItem("adminUser")
-    document.getElementById("admin-login").style.display = "flex"
-    document.getElementById("admin-dashboard").style.display = "none"
-    document.getElementById("admin-username").value = ""
-    document.getElementById("admin-password").value = ""
-    document.getElementById("login-error").textContent = ""
-    showNotification("تم تسجيل الخروج بنجاح", "success")
+  adminUser = null
+  localStorage.removeItem("adminUser")
+  localStorage.removeItem("adminLoggedIn")
+  document.getElementById("admin-login").style.display = "flex"
+  document.getElementById("admin-dashboard").style.display = "none"
+  document.getElementById("admin-username").value = ""
+  document.getElementById("admin-password").value = ""
+  showNotification("تم تسجيل الخروج بنجاح", "success")
+}
+
+function checkAdminSession() {
+  const isLoggedIn = localStorage.getItem("adminLoggedIn")
+  if (isLoggedIn === "true") {
+    const savedUser = localStorage.getItem("adminUser")
+    if (savedUser) {
+      adminUser = JSON.parse(savedUser)
+      document.getElementById("admin-login").style.display = "none"
+      document.getElementById("admin-dashboard").style.display = "flex"
+      document.getElementById("admin-name").textContent = adminUser.username
+      loadDashboardData()
+    }
   }
 }
 
 // ========== DASHBOARD ==========
-function showAdminDashboard() {
-  document.getElementById("admin-login").style.display = "none"
-  document.getElementById("admin-dashboard").style.display = "flex"
-  loadAdminData()
-  loadAdminTheme()
-  document.getElementById("admin-name").textContent = adminUser.username
-  showAdminSection("dashboard")
-  updateDashboard()
-}
-
-function showAdminSection(section) {
-  // Hide all sections
-  document.querySelectorAll(".admin-section").forEach((s) => s.classList.remove("active"))
-  document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"))
-
-  // Show selected section
-  const targetSection = document.getElementById(section + "-section")
-  if (targetSection) {
-    targetSection.classList.add("active")
-  }
-
-  // Mark button as active
-  event.currentTarget?.classList.add("active")
-
-  // Load section data
-  if (section === "dashboard") {
-    updateDashboard()
-  } else if (section === "services") {
-    renderServicesTable()
-  } else if (section === "orders") {
-    renderOrdersTable()
-  } else if (section === "payment-methods") {
-    loadPaymentMethods()
-  } else if (section === "settings") {
-    loadSettingsForm()
-  }
-}
-
-function toggleSidebar() {
-  const sidebar = document.querySelector(".sidebar")
-  sidebar.style.display = sidebar.style.display === "none" ? "block" : "none"
-}
-
-// ========== DASHBOARD SECTION ==========
-function updateDashboard() {
+function loadDashboardData() {
   const totalOrders = orders.length
-  const totalSales = orders.reduce((sum, order) => sum + order.total, 0)
-  const pendingOrders = orders.filter((o) => o.status === "pending").length
   const completedOrders = orders.filter((o) => o.status === "completed").length
+  const pendingOrders = orders.filter((o) => o.status === "pending").length
+  const totalSales = orders.reduce((sum, o) => sum + (o.total || 0), 0)
 
   document.getElementById("total-orders").textContent = totalOrders
   document.getElementById("total-sales").textContent = totalSales.toFixed(2) + " ر.س"
   document.getElementById("pending-orders").textContent = pendingOrders
   document.getElementById("completed-orders").textContent = completedOrders
 
-  renderRecentOrders()
+  loadRecentOrders()
 }
 
-function renderRecentOrders() {
+function loadRecentOrders() {
   const tbody = document.getElementById("recent-orders-tbody")
   tbody.innerHTML = ""
 
   const recentOrders = orders.slice(-5).reverse()
-
-  if (recentOrders.length === 0) {
-    tbody.innerHTML =
-      '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-gray);">لا توجد طلبات</td></tr>'
-    return
-  }
-
   recentOrders.forEach((order) => {
-    const row = tbody.insertRow()
+    const row = document.createElement("tr")
     row.innerHTML = `
-            <td>#${order.id}</td>
-            <td>${order.date}</td>
-            <td>${order.items.map((i) => i.name).join(", ")}</td>
-            <td>${order.total.toFixed(2)} ر.س</td>
-            <td><button class="status-btn status-${order.status}">${getStatusText(order.status)}</button></td>
-        `
+      <td>#${order.id}</td>
+      <td>${order.date}</td>
+      <td>${order.services.length} خدمات</td>
+      <td>${order.total.toFixed(2)} ر.س</td>
+      <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
+    `
+    tbody.appendChild(row)
   })
 }
 
@@ -202,99 +194,172 @@ function getStatusText(status) {
   return statusMap[status] || status
 }
 
-// ========== SERVICES MANAGEMENT ==========
-function renderServicesTable() {
-  const tbody = document.getElementById("services-tbody")
-  tbody.innerHTML = ""
-
-  if (services.length === 0) {
-    tbody.innerHTML =
-      '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-gray);">لا توجد خدمات - أضف خدمة جديدة</td></tr>'
-    return
-  }
-
-  services.forEach((service, index) => {
-    const pricesText = Object.entries(service.prices)
-      .map(([qty, price]) => `${qty}: ${price} ر.س`)
-      .join("<br>")
-
-    const row = tbody.insertRow()
-    row.innerHTML = `
-            <td style="text-align: center;">
-                <img src="${service.image}" alt="${service.name}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover;">
-            </td>
-            <td>${service.name}</td>
-            <td>${service.platform}</td>
-            <td>${pricesText}</td>
-            <td>
-                <button class="action-btn edit-btn" onclick="editService(${index})">
-                    <i class="fas fa-edit"></i> تعديل
-                </button>
-                <button class="action-btn delete-btn" onclick="deleteService(${index})">
-                    <i class="fas fa-trash"></i> حذف
-                </button>
-            </td>
-        `
-  })
+// ========== SIDEBAR & SECTIONS ==========
+function toggleSidebar() {
+  const sidebar = document.querySelector(".sidebar")
+  sidebar.classList.toggle("collapsed")
 }
 
+function showAdminSection(sectionName) {
+  document.querySelectorAll(".admin-section").forEach((section) => {
+    section.style.display = "none"
+  })
+  document.getElementById(sectionName + "-section").style.display = "block"
+
+  document.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.classList.remove("active")
+  })
+  event.target.classList.add("active")
+
+  if (sectionName === "services") {
+    loadServicesTable()
+  } else if (sectionName === "orders") {
+    loadOrdersTable()
+  } else if (sectionName === "payment-methods") {
+    loadPaymentMethodsData()
+  } else if (sectionName === "dashboard") {
+    loadDashboardData()
+  }
+}
+
+// ========== SERVICES MANAGEMENT ==========
 function showAddServiceForm() {
   editingServiceId = null
   document.getElementById("form-title").textContent = "إضافة خدمة جديدة"
+  document.getElementById("service-form-container").style.display = "block"
   document.getElementById("service-name").value = ""
-  document.getElementById("service-desc").value = ""
   document.getElementById("service-platform").value = ""
-  document.getElementById("prices-container").innerHTML = ""
-  addMorePrice()
+  document.getElementById("service-desc").value = ""
   document.getElementById("service-image").value = ""
   document.getElementById("image-preview").style.display = "none"
-  document.getElementById("service-form-container").style.display = "block"
+  document.getElementById("prices-container").innerHTML = ""
+  addPriceInput()
 }
 
-function addMorePrice() {
+function addPriceInput() {
   const container = document.getElementById("prices-container")
-  const priceInput = document.createElement("div")
-  priceInput.className = "price-input"
-  priceInput.innerHTML = `
-        <input type="number" placeholder="الكمية" min="1" class="input-field" required>
-        <input type="number" placeholder="السعر (ر.س)" min="0" step="0.01" class="input-field" required>
-        <button type="button" class="remove-price-btn" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
-    `
-  container.appendChild(priceInput)
+  const priceDiv = document.createElement("div")
+  priceDiv.className = "price-input-group"
+  priceDiv.innerHTML = `
+    <input type="number" placeholder="الكمية" min="1" class="input-field" style="flex: 1;">
+    <input type="number" placeholder="السعر بالريال" min="0" step="0.01" class="input-field" style="flex: 1;">
+    <button type="button" onclick="this.parentElement.remove()" class="remove-btn">
+      <i class="fas fa-trash"></i>
+    </button>
+  `
+  container.appendChild(priceDiv)
 }
 
-function editService(index) {
-  const service = services[index]
-  editingServiceId = index
-  document.getElementById("form-title").textContent = "تعديل الخدمة"
-  document.getElementById("service-name").value = service.name
-  document.getElementById("service-desc").value = service.description
-  document.getElementById("service-platform").value = service.platform
+function submitService(event) {
+  event.preventDefault()
 
-  // Load prices
-  const container = document.getElementById("prices-container")
-  container.innerHTML = ""
-  Object.entries(service.prices).forEach(([qty, price]) => {
-    const priceInput = document.createElement("div")
-    priceInput.className = "price-input"
-    priceInput.innerHTML = `
-            <input type="number" placeholder="الكمية" min="1" value="${qty}" class="input-field" required>
-            <input type="number" placeholder="السعر (ر.س)" min="0" step="0.01" value="${price}" class="input-field" required>
-            <button type="button" class="remove-price-btn" onclick="this.parentElement.remove()">
-                <i class="fas fa-times"></i>
-            </button>
-        `
-    container.appendChild(priceInput)
+  const name = document.getElementById("service-name").value.trim()
+  const platform = document.getElementById("service-platform").value
+  const desc = document.getElementById("service-desc").value.trim()
+  const imageFile = document.getElementById("service-image").files[0]
+
+  const priceInputs = document.querySelectorAll(".price-input-group")
+  const prices = []
+
+  priceInputs.forEach((group) => {
+    const quantity = Number.parseFloat(group.querySelector("input").value)
+    const price = Number.parseFloat(group.querySelectorAll("input")[1].value)
+    if (quantity && price) {
+      prices.push({ quantity, price })
+    }
   })
 
-  if (service.image && !service.image.includes("placeholder")) {
+  if (!name || !platform || !desc || prices.length === 0) {
+    showNotification("يرجى ملء جميع الحقول", "error")
+    return
+  }
+
+  if (imageFile) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      saveService(name, platform, desc, prices, e.target.result)
+    }
+    reader.readAsDataURL(imageFile)
+  } else {
+    saveService(name, platform, desc, prices, null)
+  }
+}
+
+function saveService(name, platform, desc, prices, image) {
+  if (editingServiceId) {
+    const serviceIndex = services.findIndex((s) => s.id === editingServiceId)
+    if (serviceIndex !== -1) {
+      services[serviceIndex] = {
+        ...services[serviceIndex],
+        name,
+        platform,
+        desc,
+        prices,
+        image: image || services[serviceIndex].image,
+      }
+    }
+    showNotification("تم تحديث الخدمة بنجاح", "success")
+  } else {
+    const newService = {
+      id: Date.now(),
+      name,
+      platform,
+      desc,
+      prices,
+      image,
+      createdAt: new Date().toLocaleString("ar-SA"),
+    }
+    services.push(newService)
+    showNotification("تمت إضافة الخدمة بنجاح", "success")
+  }
+
+  saveAllData()
+  cancelServiceForm()
+  loadServicesTable()
+}
+
+function editService(serviceId) {
+  const service = services.find((s) => s.id === serviceId)
+  if (!service) return
+
+  editingServiceId = serviceId
+  document.getElementById("form-title").textContent = "تعديل الخدمة"
+  document.getElementById("service-form-container").style.display = "block"
+
+  document.getElementById("service-name").value = service.name
+  document.getElementById("service-platform").value = service.platform
+  document.getElementById("service-desc").value = service.desc
+
+  if (service.image) {
     document.getElementById("image-preview").src = service.image
     document.getElementById("image-preview").style.display = "block"
   }
 
-  document.getElementById("service-form-container").style.display = "block"
+  const pricesContainer = document.getElementById("prices-container")
+  pricesContainer.innerHTML = ""
+  service.prices.forEach((price) => {
+    const priceDiv = document.createElement("div")
+    priceDiv.className = "price-input-group"
+    priceDiv.innerHTML = `
+      <input type="number" placeholder="الكمية" min="1" value="${price.quantity}" class="input-field" style="flex: 1;">
+      <input type="number" placeholder="السعر بالريال" min="0" step="0.01" value="${price.price}" class="input-field" style="flex: 1;">
+      <button type="button" onclick="this.parentElement.remove()" class="remove-btn">
+        <i class="fas fa-trash"></i>
+      </button>
+    `
+    pricesContainer.appendChild(priceDiv)
+  })
+
+  window.scrollTo(0, 0)
+}
+
+function deleteService(serviceId) {
+  if (confirm("هل أنت متأكد من حذف هذه الخدمة؟")) {
+    services = services.filter((s) => s.id !== serviceId)
+    saveAllData()
+    loadServicesTable()
+    showNotification("تم حذف الخدمة بنجاح", "success")
+  }
 }
 
 function cancelServiceForm() {
@@ -302,131 +367,126 @@ function cancelServiceForm() {
   editingServiceId = null
 }
 
-function submitService(event) {
-  event.preventDefault()
+function loadServicesTable() {
+  const tbody = document.getElementById("services-tbody")
+  tbody.innerHTML = ""
 
-  const name = document.getElementById("service-name").value.trim()
-  const desc = document.getElementById("service-desc").value.trim()
-  const platform = document.getElementById("service-platform").value
-  const imageFile = document.getElementById("service-image").files[0]
-
-  if (!name || !desc || !platform) {
-    showNotification("يرجى ملء جميع الحقول المطلوبة", "warning")
+  if (services.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">لا توجد خدمات</td></tr>'
     return
   }
 
-  // Collect prices
-  const prices = {}
-  const priceInputs = document.querySelectorAll(".price-input")
-  priceInputs.forEach((input) => {
-    const qtyInput = input.querySelector('input[type="number"]:first-child')
-    const priceInputEl = input.querySelector('input[type="number"]:last-child')
-    const qty = qtyInput?.value
-    const price = priceInputEl?.value
-    if (qty && price) {
-      prices[qty] = Number.parseFloat(price)
-    }
+  services.forEach((service) => {
+    const pricesText = service.prices.map((p) => `${p.quantity}: ${p.price}ر.س`).join(" | ")
+    const row = document.createElement("tr")
+    row.innerHTML = `
+      <td>
+        ${service.image ? `<img src="${service.image}" alt="${service.name}" style="width: 50px; height: 50px; border-radius: 5px; object-fit: cover;">` : "بدون صورة"}
+      </td>
+      <td>${service.name}</td>
+      <td>${service.platform}</td>
+      <td>${pricesText}</td>
+      <td>
+        <button onclick="editService(${service.id})" class="action-btn edit-btn" title="تعديل">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button onclick="deleteService(${service.id})" class="action-btn delete-btn" title="حذف">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    `
+    tbody.appendChild(row)
   })
-
-  if (Object.keys(prices).length === 0) {
-    showNotification("يرجى إضافة سعر واحد على الأقل", "warning")
-    return
-  }
-
-  const handleImageAndSave = (imageUrl) => {
-    const serviceData = {
-      id: editingServiceId !== null ? services[editingServiceId].id : services.length + 1,
-      name,
-      description: desc,
-      platform,
-      prices,
-      image: imageUrl,
-    }
-
-    if (editingServiceId !== null) {
-      services[editingServiceId] = serviceData
-      showNotification("تم تحديث الخدمة بنجاح", "success")
-    } else {
-      services.push(serviceData)
-      showNotification("تم إضافة الخدمة بنجاح", "success")
-    }
-
-    saveServices()
-    renderServicesTable()
-    cancelServiceForm()
-  }
-
-  if (imageFile) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      handleImageAndSave(e.target.result)
-    }
-    reader.readAsDataURL(imageFile)
-  } else {
-    const currentImage =
-      editingServiceId !== null
-        ? services[editingServiceId].image
-        : "/placeholder.svg?height=220&width=320&query=" + platform
-    handleImageAndSave(currentImage)
-  }
-}
-
-function deleteService(index) {
-  if (confirm("هل أنت متأكد من حذف هذه الخدمة؟")) {
-    services.splice(index, 1)
-    saveServices()
-    renderServicesTable()
-    showNotification("تم حذف الخدمة بنجاح", "success")
-  }
 }
 
 // ========== ORDERS MANAGEMENT ==========
-function renderOrdersTable() {
+function loadOrdersTable() {
   const tbody = document.getElementById("orders-tbody")
   tbody.innerHTML = ""
 
   if (orders.length === 0) {
-    tbody.innerHTML =
-      '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-gray);">لا توجد طلبات</td></tr>'
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">لا توجد طلبات</td></tr>'
     return
   }
 
   orders.forEach((order) => {
-    const row = tbody.insertRow()
-    const itemsList = order.items.map((i) => i.name).join(", ")
-    const paymentMethodText = getPaymentMethodText(order.paymentMethod)
-
+    const row = document.createElement("tr")
     row.innerHTML = `
-            <td>#${order.id}</td>
-            <td>${order.date}</td>
-            <td>${order.accountName || "-"}</td>
-            <td title="${itemsList}">${itemsList.substring(0, 30)}...</td>
-            <td>${order.total.toFixed(2)} ر.س</td>
-            <td>${paymentMethodText}</td>
-            <td>
-                <select onchange="updateOrderStatus(${order.id}, this.value)" class="status-btn status-${order.status}">
-                    <option value="pending" ${order.status === "pending" ? "selected" : ""}>معلقة</option>
-                    <option value="completed" ${order.status === "completed" ? "selected" : ""}>مكتملة</option>
-                    <option value="cancelled" ${order.status === "cancelled" ? "selected" : ""}>ملغاة</option>
-                </select>
-            </td>
-            <td>
-                <button class="action-btn view-btn" onclick="viewOrderDetails(${order.id})">
-                    <i class="fas fa-eye"></i> عرض
-                </button>
-            </td>
-        `
+      <td>#${order.id}</td>
+      <td>${order.date}</td>
+      <td>${order.customerName}</td>
+      <td>${order.services.length} خدمة</td>
+      <td>${order.total.toFixed(2)} ر.س</td>
+      <td>${order.paymentMethod}</td>
+      <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
+      <td>
+        <button onclick="viewOrderDetails(${order.id})" class="action-btn view-btn" title="عرض">
+          <i class="fas fa-eye"></i>
+        </button>
+        <select onchange="updateOrderStatus(${order.id}, this.value)" class="input-field" style="width: 120px;">
+          <option value="">غير الحالة</option>
+          <option value="pending">معلقة</option>
+          <option value="completed">مكتملة</option>
+          <option value="cancelled">ملغاة</option>
+        </select>
+        <button onclick="deleteOrder(${order.id})" class="action-btn delete-btn" title="حذف">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    `
+    tbody.appendChild(row)
   })
 }
 
-function getPaymentMethodText(method) {
-  const methodMap = {
-    card: "بطاقة ائتمان",
-    transfer: "تحويل بنكي",
-    "like-card": "لايك كارد",
-    whatsapp: "واتس اب",
+function viewOrderDetails(orderId) {
+  const order = orders.find((o) => o.id === orderId)
+  if (!order) return
+
+  const servicesDetails = order.services
+    .map((s) => `<li>${s.name} (${s.quantity}) - ${s.price.toFixed(2)} ر.س</li>`)
+    .join("")
+
+  const detailsHTML = `
+    <div class="order-details-view">
+      <p><strong>رقم الطلب:</strong> #${order.id}</p>
+      <p><strong>اسم العميل:</strong> ${order.customerName}</p>
+      <p><strong>البريد الإلكتروني:</strong> ${order.email}</p>
+      <p><strong>التاريخ:</strong> ${order.date}</p>
+      <p><strong>الخدمات:</strong></p>
+      <ul>${servicesDetails}</ul>
+      <p><strong>الإجمالي:</strong> ${order.total.toFixed(2)} ر.س</p>
+      <p><strong>طريقة الدفع:</strong> ${order.paymentMethod}</p>
+      <p><strong>الحالة:</strong> <span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></p>
+    </div>
+  `
+
+  document.getElementById("order-details-content").innerHTML = detailsHTML
+  document.getElementById("order-details-modal").style.display = "flex"
+}
+
+function closeOrderDetails() {
+  document.getElementById("order-details-modal").style.display = "none"
+}
+
+function updateOrderStatus(orderId, status) {
+  if (!status) return
+  const orderIndex = orders.findIndex((o) => o.id === orderId)
+  if (orderIndex !== -1) {
+    orders[orderIndex].status = status
+    saveAllData()
+    loadOrdersTable()
+    showNotification("تم تحديث حالة الطلب بنجاح", "success")
   }
-  return methodMap[method] || method
+}
+
+function deleteOrder(orderId) {
+  if (confirm("هل أنت متأكد من حذف هذا الطلب؟")) {
+    orders = orders.filter((o) => o.id !== orderId)
+    saveAllData()
+    loadOrdersTable()
+    loadDashboardData()
+    showNotification("تم حذف الطلب بنجاح", "success")
+  }
 }
 
 function filterOrders() {
@@ -438,138 +498,108 @@ function filterOrders() {
     if (filter === "") {
       row.style.display = ""
     } else {
-      const statusSelect = row.querySelector("select")
-      const currentStatus = statusSelect?.value || ""
-      row.style.display = currentStatus === filter ? "" : "none"
+      const statusBadge = row.querySelector(".status-badge")
+      const orderStatus = statusBadge ? statusBadge.className.match(/status-(\w+)/)[1] : ""
+      row.style.display = orderStatus === filter ? "" : "none"
     }
   })
 }
 
-function updateOrderStatus(orderId, status) {
-  const order = orders.find((o) => o.id === orderId)
-  if (order) {
-    order.status = status
-    saveOrders()
-    showNotification(`تم تحديث حالة الطلب إلى: ${getStatusText(status)}`, "success")
+// ========== PAYMENT METHODS ==========
+function loadPaymentMethodsData() {
+  if (paymentMethods.bank) {
+    document.getElementById("bank-name").value = paymentMethods.bank.name || ""
+    document.getElementById("bank-account").value = paymentMethods.bank.account || ""
+    document.getElementById("bank-iban").value = paymentMethods.bank.iban || ""
+  }
+
+  if (paymentMethods.likeCard) {
+    document.getElementById("like-card-code").value = paymentMethods.likeCard.code || ""
+    document.getElementById("like-card-url").value = paymentMethods.likeCard.url || ""
+  }
+
+  if (paymentMethods.whatsapp) {
+    document.getElementById("whatsapp-number").value = paymentMethods.whatsapp.number || ""
+    document.getElementById("whatsapp-channel").value = paymentMethods.whatsapp.channel || ""
+  }
+
+  if (paymentMethods.card) {
+    document.getElementById("card-message").value = paymentMethods.card.message || ""
   }
 }
 
-function viewOrderDetails(orderId) {
-  const order = orders.find((o) => o.id === orderId)
-  if (!order) return
-
-  const modal = document.getElementById("order-details-modal")
-  const content = document.getElementById("order-details-content")
-
-  const itemsHTML = order.items
-    .map(
-      (item) =>
-        `<div class="order-detail-item">
-            <strong>${item.name}</strong>
-            <span>الكمية: ${item.quantity} | السعر: ${item.price} ر.س</span>
-        </div>`,
-    )
-    .join("")
-
-  content.innerHTML = `
-        <div class="order-detail-item">
-            <strong>رقم الطلب:</strong>
-            <span>#${order.id}</span>
-        </div>
-        <div class="order-detail-item">
-            <strong>التاريخ:</strong>
-            <span>${order.date}</span>
-        </div>
-        <div class="order-detail-item">
-            <strong>اسم الحساب:</strong>
-            <span>${order.accountName || "-"}</span>
-        </div>
-        <div class="order-detail-item">
-            <strong>البريد الإلكتروني:</strong>
-            <span>${order.email || "-"}</span>
-        </div>
-        <div class="order-detail-item">
-            <strong>رقم الواتس:</strong>
-            <span>${order.phone || "-"}</span>
-        </div>
-        <div class="order-detail-item">
-            <strong>طريقة الدفع:</strong>
-            <span>${getPaymentMethodText(order.paymentMethod)}</span>
-        </div>
-        <div class="order-detail-item">
-            <strong>الحالة:</strong>
-            <span>${getStatusText(order.status)}</span>
-        </div>
-        <div class="order-detail-item">
-            <strong>الخدمات:</strong>
-        </div>
-        ${itemsHTML}
-        <div class="order-detail-item">
-            <strong>الإجمالي:</strong>
-            <span>${order.total.toFixed(2)} ر.س</span>
-        </div>
-        ${order.notes ? `<div class="order-detail-item"><strong>ملاحظات:</strong><span>${order.notes}</span></div>` : ""}
-    `
-
-  modal.style.display = "block"
-}
-
-function closeOrderDetails() {
-  document.getElementById("order-details-modal").style.display = "none"
-}
-
-// ========== PAYMENT METHODS ==========
-function loadPaymentMethods() {
-  document.getElementById("bank-name").value = paymentMethods.bankName || ""
-  document.getElementById("bank-account").value = paymentMethods.bankAccount || ""
-  document.getElementById("bank-iban").value = paymentMethods.bankIban || ""
-  document.getElementById("like-card-code").value = paymentMethods.likeCardCode || ""
-  document.getElementById("like-card-url").value = paymentMethods.likeCardUrl || ""
-  document.getElementById("whatsapp-number").value = paymentMethods.whatsappNumber || ""
-  document.getElementById("whatsapp-channel").value = paymentMethods.whatsappChannel || ""
-  document.getElementById("card-message").value = paymentMethods.cardMessage || ""
-}
-
-function savePaymentMethod(event, type) {
+function savePaymentMethod(event, method) {
   event.preventDefault()
 
-  if (type === "bank") {
-    paymentMethods.bankName = document.getElementById("bank-name").value
-    paymentMethods.bankAccount = document.getElementById("bank-account").value
-    paymentMethods.bankIban = document.getElementById("bank-iban").value
-  } else if (type === "like-card") {
-    paymentMethods.likeCardCode = document.getElementById("like-card-code").value
-    paymentMethods.likeCardUrl = document.getElementById("like-card-url").value
-  } else if (type === "whatsapp") {
-    paymentMethods.whatsappNumber = document.getElementById("whatsapp-number").value
-    paymentMethods.whatsappChannel = document.getElementById("whatsapp-channel").value
-  } else if (type === "card") {
-    paymentMethods.cardMessage = document.getElementById("card-message").value
+  if (method === "bank") {
+    paymentMethods.bank = {
+      enabled: true,
+      name: document.getElementById("bank-name").value.trim(),
+      account: document.getElementById("bank-account").value.trim(),
+      iban: document.getElementById("bank-iban").value.trim(),
+    }
+  } else if (method === "like-card") {
+    paymentMethods.likeCard = {
+      enabled: true,
+      code: document.getElementById("like-card-code").value.trim(),
+      url: document.getElementById("like-card-url").value.trim(),
+    }
+  } else if (method === "whatsapp") {
+    paymentMethods.whatsapp = {
+      enabled: true,
+      number: document.getElementById("whatsapp-number").value.trim(),
+      channel: document.getElementById("whatsapp-channel").value.trim(),
+    }
+  } else if (method === "card") {
+    paymentMethods.card = {
+      enabled: true,
+      message: document.getElementById("card-message").value.trim(),
+    }
   }
 
-  savePaymentMethods()
-  showNotification("تم حفظ طريقة الدفع بنجاح", "success")
+  saveAllData()
+  showNotification(
+    `تم حفظ ${method === "bank" ? "بيانات البنك" : method === "like-card" ? "بيانات لايك كارد" : "بيانات الدفع"} بنجاح`,
+    "success",
+  )
 }
 
 // ========== SETTINGS ==========
 function loadSettingsForm() {
-  document.getElementById("site-name").value = siteSettings.siteName || ""
-  document.getElementById("site-desc").value = siteSettings.siteDesc || ""
-  document.getElementById("site-email").value = siteSettings.siteEmail || ""
-  document.getElementById("min-order").value = siteSettings.minOrder || 0
-  document.getElementById("welcome-message").value = siteSettings.welcomeMessage || ""
+  document.getElementById("site-name").value = siteSettings.siteName
+  document.getElementById("site-desc").value = siteSettings.siteDesc
+  document.getElementById("site-email").value = siteSettings.siteEmail
+  document.getElementById("site-phone").value = siteSettings.sitePhone || ""
+  document.getElementById("min-order").value = siteSettings.minOrder
+  document.getElementById("welcome-message").value = siteSettings.welcomeMessage
+
+  if (siteSettings.socialLinks) {
+    document.getElementById("tiktok-link").value = siteSettings.socialLinks.tiktok || ""
+    document.getElementById("instagram-link").value = siteSettings.socialLinks.instagram || ""
+    document.getElementById("facebook-link").value = siteSettings.socialLinks.facebook || ""
+    document.getElementById("twitter-link").value = siteSettings.socialLinks.twitter || ""
+  }
 }
 
-function saveSiteSettingsForm(event) {
+function saveSettings(event) {
   event.preventDefault()
 
-  siteSettings.siteName = document.getElementById("site-name").value
-  siteSettings.siteDesc = document.getElementById("site-desc").value
-  siteSettings.siteEmail = document.getElementById("site-email").value
-  siteSettings.minOrder = Number.parseFloat(document.getElementById("min-order").value) || 0
-  siteSettings.welcomeMessage = document.getElementById("welcome-message").value
+  siteSettings = {
+    siteName: document.getElementById("site-name").value.trim(),
+    siteDesc: document.getElementById("site-desc").value.trim(),
+    siteEmail: document.getElementById("site-email").value.trim(),
+    sitePhone: document.getElementById("site-phone").value.trim(),
+    minOrder: Number.parseFloat(document.getElementById("min-order").value) || 0,
+    welcomeMessage: document.getElementById("welcome-message").value.trim(),
+    socialLinks: {
+      tiktok: document.getElementById("tiktok-link").value.trim(),
+      instagram: document.getElementById("instagram-link").value.trim(),
+      facebook: document.getElementById("facebook-link").value.trim(),
+      twitter: document.getElementById("twitter-link").value.trim(),
+    },
+  }
 
-  saveSiteSettings()
+  saveAllData()
   showNotification("تم حفظ الإعدادات بنجاح", "success")
 }
 
@@ -577,58 +607,33 @@ function saveSiteSettingsForm(event) {
 function showNotification(message, type = "info") {
   const notification = document.createElement("div")
   notification.className = `notification notification-${type}`
-  notification.textContent = message
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: ${type === "success" ? "#10b981" : type === "error" ? "#ef4444" : type === "warning" ? "#f59e0b" : "#3b82f6"};
-    color: white;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    z-index: 10000;
-    animation: slideIn 0.3s ease-in-out;
+  notification.innerHTML = `
+    <i class="fas fa-${type === "success" ? "check-circle" : type === "error" ? "exclamation-circle" : "info-circle"}"></i>
+    ${message}
   `
   document.body.appendChild(notification)
-  setTimeout(() => notification.remove(), 3000)
+
+  setTimeout(() => {
+    notification.classList.add("show")
+  }, 10)
+
+  setTimeout(() => {
+    notification.classList.remove("show")
+    setTimeout(() => notification.remove(), 300)
+  }, 3000)
 }
 
-// ========== MODAL CLOSE ==========
-window.onclick = (event) => {
-  const modal = document.getElementById("order-details-modal")
-  if (event.target === modal) {
-    modal.style.display = "none"
-  }
-}
-
-// ========== IMAGE PREVIEW ==========
-document.addEventListener("DOMContentLoaded", () => {
-  const imageInput = document.getElementById("service-image")
-  if (imageInput) {
-    imageInput.addEventListener("change", (e) => {
-      const file = e.target.files[0]
-      if (file) {
-        const reader = new FileReader()
-        reader.onload = (event) => {
-          const preview = document.getElementById("image-preview")
-          preview.src = event.target.result
-          preview.style.display = "block"
-        }
-        reader.readAsDataURL(file)
+document.addEventListener("change", (e) => {
+  if (e.target.id === "service-image") {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const preview = document.getElementById("image-preview")
+        preview.src = event.target.result
+        preview.style.display = "block"
       }
-    })
-  }
-})
-
-// ========== INITIALIZE ==========
-window.addEventListener("load", () => {
-  loadAdminTheme()
-
-  // Check if admin is already logged in
-  const savedAdmin = localStorage.getItem("adminUser")
-  if (savedAdmin) {
-    adminUser = JSON.parse(savedAdmin)
-    showAdminDashboard()
+      reader.readAsDataURL(file)
+    }
   }
 })
